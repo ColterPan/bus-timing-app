@@ -36,7 +36,7 @@ cd C:\dev\bus-timing-app\server; npm install
 cd C:\dev\bus-timing-app\app;    npm install
 ```
 
-Add your key: copy `server/.env.example` to `server/.env` and set `LTA_ACCOUNT_KEY=...`. (This has already been done on this laptop.) **Never commit `.env`**, it's gitignored.
+Add your key: copy `server/.env.example` to `server/.env` and set `LTA_ACCOUNT_KEY=...`. **Never commit `.env`**, it's gitignored.
 
 ---
 
@@ -49,7 +49,7 @@ You need two terminals.
 cd C:\dev\bus-timing-app\server
 npm run dev
 ```
-It prints `http://localhost:3000/health` and your Wi-Fi IP, e.g. `http://10.41.68.155:3000`. Check that it works by opening http://localhost:3000/arrivals/83139.
+It prints `http://localhost:3000/health` and your Wi-Fi IP, e.g. `http://192.168.1.10:3000`. Check that it works by opening http://localhost:3000/arrivals/83139.
 
 **Terminal 2: app**
 ```powershell
@@ -155,5 +155,5 @@ Then build the APK:
 ## Notes
 
 - The project lives outside OneDrive on purpose. Syncing `node_modules` breaks the bundler's file watching.
-- `app/package.json` has an npm `overrides` entry for `react-native-worklets`: SDK 58's `expo-modules-core` declares an outdated peer range. It also excludes `jest`/`@types/jest` from `expo install --check`, because jest-expo 58 runs on Jest 30.
+- `app/package.json` has an npm `overrides` entry for `react-native-worklets`: SDK 58's `expo-modules-core` declares an outdated peer range. The override is pinned to the same version as `react-native-worklets` in `dependencies`; bump both together. It also excludes `jest`/`@types/jest` from `expo install --check`, because jest-expo 58 runs on Jest 30.
 - The DataMall terms ask for reasonable call rates. The proxy caches arrivals for 15 s per stop and the stop list for 24 h, and the app keeps its own copy of the stop list for a week.
