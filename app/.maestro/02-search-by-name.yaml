@@ -1,0 +1,19 @@
+# E2E: search by stop name/road and open the result.
+appId: com.colterpan.sgbustiming
+---
+- launchApp
+- tapOn: "Search"
+- tapOn:
+    id: "search-input"
+- inputText: "joo chiat"
+- extendedWaitUntil:
+    visible:
+      id: "stop-.*"
+    timeout: 30000
+- tapOn:
+    id: "stop-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "favourite-toggle"
+    timeout: 20000

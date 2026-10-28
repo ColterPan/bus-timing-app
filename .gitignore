@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler/
+coverage/
+dist/
+.expo/
+web-build/
+*.apk
+*.aab
+.DS_Store

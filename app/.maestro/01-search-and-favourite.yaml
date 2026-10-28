@@ -1,0 +1,27 @@
+# E2E: search a stop by code, see live arrivals, favourite it, find it on Home.
+# Needs the APK (or a dev build) installed on an emulator/phone and the proxy reachable.
+# Run: maestro test .maestro/
+appId: com.colterpan.sgbustiming
+---
+- launchApp:
+    clearState: true
+- assertVisible: "No favourites yet.*"
+- tapOn: "Search"
+- tapOn:
+    id: "search-input"
+- inputText: "83139"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible:
+      id: "arrival-row-.*"
+    timeout: 20000
+- tapOn:
+    id: "favourite-toggle"
+- back
+- tapOn: "Favourites"
+- assertVisible:
+    id: "fav-83139"
+- extendedWaitUntil:
+    visible:
+      id: "arrival-row-.*"
+    timeout: 20000

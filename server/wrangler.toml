@@ -1,0 +1,6 @@
+name = "bus-timing-proxy"
+main = "src/worker.ts"
+compatibility_date = "2026-10-01"
+
+# The API key is a secret, set it with:
+#   npx wrangler secret put LTA_ACCOUNT_KEY
