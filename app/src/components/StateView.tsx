@@ -29,7 +29,7 @@ export function StateView({ kind, message, icon, actionLabel, onAction }: Props)
           style={[styles.button, { backgroundColor: theme.primary }]}
           accessibilityRole="button"
         >
-          <Text style={styles.buttonText}>{actionLabel}</Text>
+          <Text style={[styles.buttonText, { color: theme.onPrimary }]}>{actionLabel}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -40,5 +40,5 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
   message: { fontSize: 15, textAlign: 'center', lineHeight: 21 },
   button: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, marginTop: 4 },
-  buttonText: { color: '#FFFFFF', fontWeight: '600' },
+  buttonText: { fontWeight: '600' },
 });

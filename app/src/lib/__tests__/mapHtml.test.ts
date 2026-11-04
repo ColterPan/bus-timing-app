@@ -42,7 +42,14 @@ function fakeLeaflet() {
     clearLayers: () => layerItems.splice(0),
     addLayer: (m: unknown) => layerItems.push(m),
   };
-  const userMarker = { latlng: null as unknown, setLatLng: jest.fn(), addTo: jest.fn(), remove: jest.fn() };
+  const markerEl = { classList: { add: jest.fn(), remove: jest.fn() }, offsetWidth: 20 };
+  const userMarker = {
+    latlng: null as unknown,
+    setLatLng: jest.fn(),
+    addTo: jest.fn(),
+    remove: jest.fn(),
+    getElement: () => markerEl,
+  };
   userMarker.setLatLng.mockImplementation((l) => ((userMarker.latlng = l), userMarker));
   userMarker.addTo.mockReturnValue(userMarker);
   const circle = {
@@ -75,7 +82,7 @@ function fakeLeaflet() {
       return m;
     },
   };
-  return { L, map, handlers, layerItems, userMarker, circle };
+  return { L, map, handlers, layerItems, userMarker, circle, markerEl };
 }
 
 function runMapPage(dark = false) {
@@ -187,6 +194,56 @@ describe('map page script', () => {
 
     expect(userMarker.remove).toHaveBeenCalled();
     expect(circle.remove).toHaveBeenCalled();
+  });
+
+  it('pins are SG BUS green (nearest stay orange)', () => {
+    const { win, map, handlers, layerItems } = runMapPage();
+    win.onAppCommand({ type: 'stops', stops: STOPS });
+    win.onAppCommand({ type: 'user', position: { lat: 1.3112, lng: 103.9 }, nearest: ['83139'], recenter: false, radiusM: 500 });
+    map.zoom = 17;
+    handlers.moveend!();
+
+    const fills = layerItems.map((m) => [m.latlng[0], m.opts.fillColor]);
+    expect(fills).toContainEqual([1.311, '#E8590C']); // nearest
+    expect(fills).toContainEqual([1.312, '#5FA00A']); // other stop
+  });
+
+  it('shows you as a red person marker, not a pin-coloured dot', () => {
+    const { win, L } = runMapPage();
+    win.onAppCommand({ type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: [], recenter: false, radiusM: 500 });
+
+    const icon = (L.marker.mock.calls[0] as any)[1].icon;
+    expect(icon.className).toBe('user-marker');
+    expect(icon.html).toContain('<svg');
+    expect(buildStopMapHtml({ dark: false })).toMatch(/\.user-marker[^}]*background: #E11D48/);
+  });
+
+  it('bounces the marker when your location refreshes or you tap locate', () => {
+    const { win, markerEl } = runMapPage();
+    const send = (lat: number, recenter: boolean) =>
+      win.onAppCommand({ type: 'user', position: { lat, lng: 103.9 }, nearest: [], recenter, radiusM: 500 });
+
+    send(1.31, false); // first fix
+    expect(markerEl.classList.add).toHaveBeenLastCalledWith('bounce');
+
+    markerEl.classList.add.mockClear();
+    send(1.31, false); // same spot, nothing new
+    expect(markerEl.classList.add).not.toHaveBeenCalled();
+
+    send(1.311, false); // moved
+    expect(markerEl.classList.add).toHaveBeenCalledWith('bounce');
+
+    markerEl.classList.add.mockClear();
+    send(1.311, true); // ⌖ tapped
+    expect(markerEl.classList.remove).toHaveBeenCalledWith('bounce');
+    expect(markerEl.classList.add).toHaveBeenCalledWith('bounce');
+  });
+
+  it('tints the 500 m circle red to match your marker', () => {
+    const { win, L } = runMapPage();
+    win.onAppCommand({ type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: [], recenter: false, radiusM: 500 });
+
+    expect((L.circle.mock.calls[0] as any)[1]).toMatchObject({ color: '#E11D48', fillColor: '#E11D48' });
   });
 
   it('ignores unknown commands', () => {

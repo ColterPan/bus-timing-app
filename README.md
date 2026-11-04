@@ -1,4 +1,6 @@
-# SG Bus Timing
+# SG BUS
+
+<img src="app/assets/icon.png" alt="SG BUS icon: a white double-decker bus front on lush green" width="96" />
 
 A BusLah-style Singapore bus arrival app. It has an Expo (React Native) Android app and a small proxy server that keeps your LTA DataMall key private.
 

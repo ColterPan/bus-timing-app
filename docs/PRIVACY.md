@@ -1,8 +1,8 @@
-# Privacy Policy: SG Bus Timing
+# Privacy Policy: SG BUS
 
 _Effective 4 November 2026_
 
-SG Bus Timing ("the app") shows Singapore bus arrival times. It is an independent app and is not affiliated with the Land Transport Authority (LTA).
+SG BUS ("the app") shows Singapore bus arrival times. It is an independent app and is not affiliated with the Land Transport Authority (LTA).
 
 ## Summary
 

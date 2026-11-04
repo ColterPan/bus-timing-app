@@ -1,0 +1,31 @@
+<!-- SG BUS app icon (generated from sg-bus-glyph.svg): lush-green background + white bus front -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86D21A"/><stop offset="1" stop-color="#6BB509"/></linearGradient></defs>
+         <rect width="1024" height="1024" rx="0" fill="url(#bg)"/><g transform="translate(512 512) scale(0.84) translate(-512 -518)">
+  <defs>
+    <mask id="cutouts">
+      <rect width="1024" height="1024" fill="#FFFFFF"/>
+      
+      <rect x="372" y="262" width="280" height="50" rx="14" fill="#000000"/>
+      
+      <rect x="352" y="332" width="320" height="140" rx="26" fill="#000000"/>
+      
+      <rect x="352" y="500" width="320" height="168" rx="26" fill="#000000"/>
+      
+      <circle cx="400" cy="718" r="21" fill="#000000"/>
+      <circle cx="624" cy="718" r="21" fill="#000000"/>
+      <rect x="464" y="708" width="96" height="20" rx="10" fill="#000000"/>
+    </mask>
+  </defs>
+  <g fill="#FFFFFF">
+    
+    <rect x="312" y="222" width="400" height="548" rx="66" mask="url(#cutouts)"/>
+    
+    <rect x="352" y="752" width="82" height="62" rx="20"/>
+    <rect x="590" y="752" width="82" height="62" rx="20"/>
+    
+    <rect x="262" y="346" width="34" height="104" rx="15"/>
+    <rect x="728" y="346" width="34" height="104" rx="15"/>
+    <rect x="282" y="356" width="40" height="16" rx="8"/>
+    <rect x="702" y="356" width="40" height="16" rx="8"/>
+  </g>
+</g></svg>

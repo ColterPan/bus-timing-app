@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SG Bus Timing",
+    "name": "SG BUS",
     "slug": "sg-bus-timing",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
     "android": {
       "package": "com.colterpan.sgbustiming",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#7AC70C",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -25,6 +25,10 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
+      "name": "SG BUS",
+      "shortName": "SG BUS",
+      "themeColor": "#7AC70C",
+      "backgroundColor": "#7AC70C",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
@@ -37,7 +41,15 @@
         }
       ],
       "expo-font",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#7AC70C",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

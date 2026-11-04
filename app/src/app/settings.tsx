@@ -30,7 +30,7 @@ export default function SettingsScreen() {
 
       {heading('ABOUT')}
       <View style={[styles.card, { backgroundColor: theme.card }]}>
-        <Text style={[styles.title, { color: theme.text }]}>SG Bus Timing · v{version}</Text>
+        <Text style={[styles.title, { color: theme.text }]}>SG BUS · v{version}</Text>
         <Text style={[styles.body, { color: theme.muted }]}>
           Contains information from LTA DataMall, made available under the terms of the Singapore Open Data
           Licence version 1.0. Map tiles © OneMap, Singapore Land Authority. MRT system map © Land Transport

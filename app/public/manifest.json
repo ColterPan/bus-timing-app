@@ -1,0 +1,13 @@
+{
+  "name": "SG BUS",
+  "short_name": "SG BUS",
+  "description": "Live Singapore bus arrival times and nearby stops on a map.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#7AC70C",
+  "background_color": "#7AC70C",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

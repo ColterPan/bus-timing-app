@@ -1,4 +1,6 @@
-# Publishing SG Bus Timing on Google Play
+# Publishing SG BUS on Google Play
+
+> **Naming first:** "SGBUS" is the Land Transport Authority's own brand for Singapore's public buses (it's on the side of every green bus), and the lush green is their livery. Using them is fine for personal testing. For a public Play Store release, pick a distinct name (e.g. "SG Bus Timing" or something of your own), and consider a different icon colour too, or Google may reject the app as impersonating a government agency. Change `"name"` in `app/app.json`, and the icon via `app/assets/brand/`.
 
 This is a step-by-step guide for a first-time Android publisher. Expect it to take **3–5 weeks** end to end. Most of that is Google's mandatory 14-day closed test and their reviews, not work.
 
@@ -44,7 +46,7 @@ The app still uses Expo's default icon, and Google will reject placeholder brand
 
 Tips:
 - Take screenshots from your own phone running the app: the Nearby map, a stop's times, Favourites, the MRT map, and dark mode.
-- **Don't use LTA's logo, the "BusLah" name or anything that looks official.** Google removes apps that impersonate government agencies or other apps. "SG Bus Timing" plus a generic bus icon is fine.
+- **Don't use LTA's logo or "SGBUS" brand, the "BusLah" name, or anything that looks official.** Google removes apps that impersonate government agencies or other apps. A distinct name plus a generic bus icon is fine (see the naming note at the top).
 
 ## 3. Create a Google Play developer account
 
@@ -73,7 +75,7 @@ npx eas-cli@latest build -p android --profile production
 
 ## 5. Create the app in Play Console
 
-**Home → Create app:** enter the name ("SG Bus Timing"), default language English, choose **App**, **Free**, and accept the declarations.
+**Home → Create app:** enter your public app name (see the naming note at the top), default language English, choose **App**, **Free**, and accept the declarations.
 
 Then complete every item under **Dashboard → Set up your app**:
 
@@ -93,7 +95,7 @@ Suggested short description:
 > Live Singapore bus arrival times, nearby stops on a map, favourites and the MRT map.
 
 Suggested start of the full description:
-> SG Bus Timing shows live bus arrivals for every stop in Singapore. Open the app and your nearest stops, and the closest stop's bus times, are right there on a map. Save favourite stops, search by stop code, name or road, and check the MRT system map. Light and dark themes.
+> [App name] shows live bus arrivals for every stop in Singapore. Open the app and your nearest stops, and the closest stop's bus times, are right there on a map. Save favourite stops, search by stop code, name or road, and check the MRT system map. Light and dark themes.
 > Bus arrival data from LTA DataMall (Singapore Open Data Licence v1.0). Map tiles © OneMap / Singapore Land Authority. This app is independent and not affiliated with or endorsed by LTA.
 
 ## 6. Closed test: 12 testers × 14 days

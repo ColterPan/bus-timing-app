@@ -17,11 +17,47 @@ const ONEMAP_ATTRIBUTION =
 
 const BG = { light: '#F2F3F7', dark: '#0B0F17' };
 
+const PIN_GREEN = '#5FA00A'; // SG BUS green, a touch deeper so pins stand out on both map styles
+const PIN_NEAREST = '#E8590C';
+const USER_RED = '#E11D48'; // "you are here": a colour no stop pin uses
+
+// White person figure for the "you are here" marker (static markup, no user data)
+const PERSON_SVG =
+  '<div class="user-figure"><svg viewBox="0 0 24 24" aria-hidden="true">' +
+  '<circle cx="12" cy="5.5" r="3.3"/>' +
+  '<path d="M12 10c-2.8 0-4.8 1.7-4.8 4.2v1.6h2.3V22h5v-6.2h2.3v-1.6C16.8 11.7 14.8 10 12 10z"/>' +
+  '</svg></div>';
+
+const USER_MARKER_CSS = `
+  .user-marker { background: transparent; border: 0; }
+  .user-marker .user-figure {
+    box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%;
+    background: ${USER_RED}; border: 3px solid #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    animation: halo 2s infinite;
+  }
+  .user-marker svg { width: 17px; height: 17px; fill: #FFFFFF; }
+  /* Bounce the inner figure: Leaflet positions the outer element with transforms */
+  .user-marker.bounce .user-figure { animation: bounce 0.9s ease-out, halo 2s 0.9s infinite; }
+  @keyframes halo {
+    0% { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(225, 29, 72, 0.55); }
+    70% { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 18px rgba(225, 29, 72, 0); }
+    100% { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 0 0 rgba(225, 29, 72, 0); }
+  }
+  @keyframes bounce {
+    0% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-16px) scale(1.15); }
+    50% { transform: translateY(0) scale(0.95); }
+    70% { transform: translateY(-6px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+  }`;
+
 // Leaflet's zoom buttons and credits bar are white by default; match them to dark mode
 const DARK_CONTROLS_CSS = `
   .leaflet-bar a, .leaflet-bar a:hover { background: #161B26; color: #F3F4F6; border-bottom-color: #262C3A; }
   .leaflet-control-attribution { background: rgba(22, 27, 38, 0.85) !important; color: #9CA3AF; }
-  .leaflet-control-attribution a { color: #5EA0FF; }`;
+  .leaflet-control-attribution a { color: #7AC70C; }`;
 
 /** Sends a message to the app from inside the page (WebView bridge or parent window). */
 const SEND_FN = `function send(msg) {
@@ -55,6 +91,7 @@ function mapScript(tilesUrl: string): string {
   var nearest = {};
   var userMarker = null;
   var radiusCircle = null;
+  var lastUserLatLng = null;
   var centred = false;
 
   function label(stop) {
@@ -69,7 +106,7 @@ function mapScript(tilesUrl: string): string {
       radius: isNearest ? 9 : 7,
       weight: 2,
       color: '#FFFFFF',
-      fillColor: isNearest ? '#E8590C' : '#1E6FD9',
+      fillColor: isNearest ? '${PIN_NEAREST}' : '${PIN_GREEN}',
       fillOpacity: 1,
       className: isNearest ? 'pin nearest' : 'pin'
     })
@@ -96,13 +133,25 @@ function mapScript(tilesUrl: string): string {
     }
   }
 
-  function setUser(position, radiusM) {
+  // Replay the bounce so you can spot yourself after a refresh or a tap on locate
+  function bounceUser() {
+    var el = userMarker && userMarker.getElement && userMarker.getElement();
+    if (!el) return;
+    el.classList.remove('bounce');
+    void el.offsetWidth; // restart the CSS animation
+    el.classList.add('bounce');
+  }
+
+  function setUser(position, radiusM, recenter) {
     if (!position) {
       if (userMarker) { userMarker.remove(); userMarker = null; }
       if (radiusCircle) { radiusCircle.remove(); radiusCircle = null; }
+      lastUserLatLng = null;
       return;
     }
     var latLng = [position.lat, position.lng];
+    var moved = !lastUserLatLng || lastUserLatLng[0] !== latLng[0] || lastUserLatLng[1] !== latLng[1];
+    lastUserLatLng = latLng;
     // Shaded circle showing how far "nearby" reaches
     if (radiusM > 0) {
       if (radiusCircle) {
@@ -111,11 +160,11 @@ function mapScript(tilesUrl: string): string {
       } else {
         radiusCircle = L.circle(latLng, {
           radius: radiusM,
-          color: '#1E6FD9',
+          color: '${USER_RED}',
           weight: 1,
           opacity: 0.5,
-          fillColor: '#1E6FD9',
-          fillOpacity: 0.07,
+          fillColor: '${USER_RED}',
+          fillOpacity: 0.06,
           interactive: false
         }).addTo(map);
       }
@@ -124,12 +173,13 @@ function mapScript(tilesUrl: string): string {
       userMarker.setLatLng(latLng);
     } else {
       userMarker = L.marker(latLng, {
-        icon: L.divIcon({ className: 'user-dot', iconSize: [20, 20] }),
+        icon: L.divIcon({ className: 'user-marker', html: ${JSON.stringify(PERSON_SVG)}, iconSize: [30, 30] }),
         interactive: false,
         keyboard: false,
         zIndexOffset: 1000
       }).addTo(map);
     }
+    if (moved || recenter) bounceUser();
   }
 
   window.onAppCommand = function (cmd) {
@@ -140,7 +190,7 @@ function mapScript(tilesUrl: string): string {
     } else if (cmd.type === 'user') {
       nearest = {};
       (cmd.nearest || []).forEach(function (code) { nearest[code] = true; });
-      setUser(cmd.position, cmd.radiusM);
+      setUser(cmd.position, cmd.radiusM, cmd.recenter === true);
       // Centre on the first fix or when asked; otherwise leave the map where the user dragged it
       if (cmd.position && (cmd.recenter || !centred)) {
         centred = true;
@@ -172,15 +222,7 @@ export function buildStopMapHtml({ dark }: { dark: boolean }): string {
 <link rel="stylesheet" href="${LEAFLET_CSS}" integrity="${LEAFLET_CSS_SRI}" crossorigin="anonymous">
 <style>
   html, body, #map { height: 100%; margin: 0; padding: 0; background: ${bg}; }
-  .user-dot {
-    box-sizing: border-box; background: #1E6FD9; border: 3px solid #FFFFFF; border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(30, 111, 217, 0.6); }
-    70% { box-shadow: 0 0 0 16px rgba(30, 111, 217, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(30, 111, 217, 0); }
-  }
+  ${USER_MARKER_CSS}
   .leaflet-tooltip { font: 13px system-ui, sans-serif; }${dark ? DARK_CONTROLS_CSS : ''}
 </style>
 </head>
