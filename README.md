@@ -11,9 +11,21 @@ Phone / laptop browser / emulator ──► Proxy (Hono) ──► LTA DataMall
 | Folder | What | Tests |
 |---|---|---|
 | `server/` | Proxy: `/arrivals/:code`, `/stops`, `/health`. Holds the API key, caches responses, rate-limits callers | Vitest, 36 tests, ~95% coverage |
-| `app/` | Expo SDK 58 app: Favourites, Nearby (GPS), Search, Stop detail | Jest + RNTL, 75 tests, 100% line coverage; Maestro E2E flows |
+| `app/` | Expo SDK 58 app: Favourites, Nearby (map + GPS), Search, MRT Map, Stop detail | Jest + RNTL, 110 tests, ~99% line coverage; Maestro E2E flows |
 
-**Features:** live next-3-bus ETAs, crowd level (green = seats, amber = standing, red = limited standing), double-deck/bendy badges, wheelchair icon, a "sched" tag when the time isn't live GPS, 20-second auto refresh, pull to refresh, favourite stops, pin specific services, nearest stops within 500 m, and search by code, name or road. Dark mode follows the phone setting.
+## Features
+
+- **Live bus times:** next 3 buses per service; crowd level (green = seats, amber = standing, red = limited standing); double-deck/bendy badges; wheelchair icon; a "sched" tag when the time isn't live GPS. Auto refresh every 20 s, plus pull to refresh.
+- **Nearby map:**
+  - A draggable map with a blue "you are here" dot and bus-stop pins (the nearest are orange). Tap a pin to open that stop's times.
+  - The ⌖ button jumps back to your location, and the tab re-locates you whenever you open it.
+- **Nearby list:** the 10 nearest stops under the map. Tap one to drop down its live times, or ☆ to save it.
+- **Favourites:** save stops with the ☆ from Nearby, Search or the stop page, and pin specific services.
+- **Search:** by 5-digit stop code, stop name or road.
+- **MRT map:** LTA's official system map (pinch or tap to zoom), with a link to the latest version on LTA's site.
+- Dark mode follows the phone setting.
+
+**Credits:** map tiles by [OneMap](https://www.onemap.gov.sg/) © Singapore Land Authority, with [Leaflet](https://leafletjs.com/); MRT system map © [Land Transport Authority](https://www.lta.gov.sg/), loaded live from LTA's website; bus data from [LTA DataMall](https://datamall.lta.gov.sg/). None of these need an API key in the app. The only key (LTA DataMall) stays on the proxy server.
 
 ---
 
@@ -99,7 +111,11 @@ cd app;    npx expo-doctor   # dependency health check
 ```powershell
 cd app; maestro test .maestro/
 ```
-Flows: search by code, then live arrivals, then favourite, then check Home; and search by name, then open the stop.
+Flows:
+
+- search by code, see live arrivals, favourite the stop, then check Home
+- search by name, then open the stop
+- on Nearby, allow location, expand a stop's dropdown, ☆ it, tap ⌖, then check the MRT Map tab and Favourites
 
 ---
 
@@ -133,6 +149,11 @@ Then build the APK:
 - [ ] **Auto refresh:** leave the stop screen open; "Updated" time changes every ~20 s
 - [ ] **Crowd colours** and DD/BD badges look right for buses you can see
 - [ ] **Nearby:** grant location; the closest stops are listed with sensible distances
+- [ ] **Map:** the blue dot is where you're standing; drag and pinch to explore; zoom in to see more pins; tap a pin to open that stop's times
+- [ ] **⌖ button:** drag the map away, tap ⌖, and it jumps back to you
+- [ ] **Dropdown:** tap a nearby stop to see its live times inline; tap again to close; ☆ saves it
+- [ ] **Re-locate:** walk somewhere else (or wait 30 s), switch tabs and come back; the nearest list updates without restarting the app
+- [ ] **MRT Map:** the official map loads; pinch/tap to zoom; "Latest on LTA" opens LTA's website
 - [ ] **Location denied:** deny permission; you get a clear message and a button to fix it
 - [ ] **Search:** by 5-digit code (Enter opens it), by stop name, by road name
 - [ ] **Favourites:** star a stop and it shows on Home; pin one service and only that service shows; kill and reopen the app and favourites are still there

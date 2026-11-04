@@ -5,6 +5,8 @@ import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { StateView } from '../../components/StateView';
 import { StopCard } from '../../components/StopCard';
 import { isStopCode, searchStops } from '../../lib/search';
+import { isFavouriteStop } from '../../store/favourites';
+import { useFavourites } from '../../store/FavouritesContext';
 import { useStops } from '../../store/StopsContext';
 import { useTheme } from '../../theme';
 
@@ -14,6 +16,7 @@ export default function SearchScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { stops, loading, error, retry } = useStops();
+  const { favourites, toggleStop } = useFavourites();
   const [query, setQuery] = useState('');
 
   const trimmed = query.trim();
@@ -51,7 +54,14 @@ export default function SearchScreen() {
         data={results}
         keyExtractor={(s) => s.code}
         keyboardShouldPersistTaps="handled"
-        renderItem={({ item }) => <StopCard stop={item} onPress={() => openStop(item.code)} />}
+        renderItem={({ item }) => (
+          <StopCard
+            stop={item}
+            onPress={() => openStop(item.code)}
+            isFavourite={isFavouriteStop(favourites, item.code)}
+            onToggleFavourite={() => toggleStop(item.code)}
+          />
+        )}
         contentContainerStyle={{ paddingBottom: 16 }}
       />
     );

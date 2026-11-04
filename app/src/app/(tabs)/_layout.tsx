@@ -27,6 +27,7 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ title: 'Favourites', tabBarIcon: tabIcon('star') }} />
       <Tabs.Screen name="nearby" options={{ title: 'Nearby', tabBarIcon: tabIcon('navigate') }} />
       <Tabs.Screen name="search" options={{ title: 'Search', tabBarIcon: tabIcon('search') }} />
+      <Tabs.Screen name="mrt" options={{ title: 'MRT Map', tabBarIcon: tabIcon('train') }} />
     </Tabs>
   );
 }

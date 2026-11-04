@@ -21,6 +21,20 @@ describe('StopCard', () => {
     await render(<StopCard stop={stop} onPress={() => {}} />);
     expect(screen.getByRole('button', { name: 'Blk 89, Joo Chiat Rd, stop 83139' })).toBeOnTheScreen();
   });
+
+  it('has no star unless a favourite handler is given', async () => {
+    await render(<StopCard stop={stop} onPress={() => {}} />);
+    expect(screen.queryByRole('button', { name: /favourites/ })).toBeNull();
+  });
+
+  it('toggles the favourite star', async () => {
+    const onToggleFavourite = jest.fn();
+    await render(<StopCard stop={stop} onPress={() => {}} isFavourite={false} onToggleFavourite={onToggleFavourite} />);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Add Blk 89 to favourites' }));
+
+    expect(onToggleFavourite).toHaveBeenCalled();
+  });
 });
 
 describe('StateView', () => {

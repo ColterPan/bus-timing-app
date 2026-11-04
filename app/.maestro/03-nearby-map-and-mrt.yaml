@@ -1,0 +1,37 @@
+# E2E: Nearby map + dropdown + favourite, then the MRT map tab.
+# Needs location turned on for the emulator/phone. Run: maestro test .maestro/
+appId: com.colterpan.sgbustiming
+---
+- launchApp:
+    clearState: true
+- tapOn: "Nearby"
+# Android permission dialog (wording differs by Android version)
+- runFlow:
+    when:
+      visible: "While using the app"
+    commands:
+      - tapOn: "While using the app"
+- assertVisible:
+    id: "locate-button"
+- extendedWaitUntil:
+    visible:
+      id: "nearby-toggle-.*"
+    timeout: 30000
+- tapOn:
+    id: "nearby-toggle-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "nearby-open-.*"
+    timeout: 20000
+- tapOn:
+    id: "nearby-star-.*"
+    index: 0
+- tapOn:
+    id: "locate-button"
+- tapOn: "MRT Map"
+- assertVisible:
+    id: "mrt-lta-link"
+- tapOn: "Favourites"
+- assertVisible:
+    id: "fav-.*"
