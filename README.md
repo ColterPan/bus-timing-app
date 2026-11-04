@@ -32,8 +32,8 @@ Then install the dependencies:
 
 ```powershell
 nvm use 22.23.3
-cd C:\dev\bus-timing-app\server; npm install
-cd C:\dev\bus-timing-app\app;    npm install
+cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\server"; npm install
+cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\app";    npm install
 ```
 
 Add your key: copy `server/.env.example` to `server/.env` and set `LTA_ACCOUNT_KEY=...`. **Never commit `.env`**, it's gitignored.
@@ -46,14 +46,14 @@ You need two terminals.
 
 **Terminal 1: proxy**
 ```powershell
-cd C:\dev\bus-timing-app\server
+cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\server"
 npm run dev
 ```
 It prints `http://localhost:3000/health` and your Wi-Fi IP, e.g. `http://192.168.1.10:3000`. Check that it works by opening http://localhost:3000/arrivals/83139.
 
 **Terminal 2: app**
 ```powershell
-cd C:\dev\bus-timing-app\app
+cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\app"
 npx expo start
 ```
 Then press:
@@ -108,7 +108,7 @@ Flows: search by code, then live arrivals, then favourite, then check Home; and 
 The APK can't use your laptop as the proxy once you leave home, so first deploy the proxy to Cloudflare (free):
 
 ```powershell
-cd C:\dev\bus-timing-app\server
+cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\server"
 npx wrangler login
 npx wrangler secret put LTA_ACCOUNT_KEY   # paste your key when prompted
 npm run deploy                            # prints https://bus-timing-proxy.<you>.workers.dev
@@ -119,7 +119,7 @@ Then build the APK:
 1. In `app/eas.json`, replace both `https://bus-timing-proxy.REPLACE-ME.workers.dev` with your Worker URL.
 2. Run:
    ```powershell
-   cd C:\dev\bus-timing-app\app
+   cd "C:\Users\colte\OneDrive\Documents\Personal Project\Bus Timing App\app"
    npx eas-cli@latest login
    npx eas-cli@latest build -p android --profile preview
    ```
@@ -154,6 +154,6 @@ Then build the APK:
 
 ## Notes
 
-- The project lives outside OneDrive on purpose. Syncing `node_modules` breaks the bundler's file watching.
+- The project lives in OneDrive, which also syncs `node_modules` (~700 MB). If `npm install` is slow, pause OneDrive sync (OneDrive icon → Settings → Pause syncing) and resume afterwards. If Expo stops noticing file changes, run `npx expo start --clear`. GitHub is the real backup.
 - `app/package.json` has an npm `overrides` entry for `react-native-worklets`: SDK 58's `expo-modules-core` declares an outdated peer range. The override is pinned to the same version as `react-native-worklets` in `dependencies`; bump both together. It also excludes `jest`/`@types/jest` from `expo install --check`, because jest-expo 58 runs on Jest 30.
 - The DataMall terms ask for reasonable call rates. The proxy caches arrivals for 15 s per stop and the stop list for 24 h, and the app keeps its own copy of the stop list for a week.
