@@ -7,7 +7,7 @@ export type MapStop = [string, string, number, number];
 /** Commands the app sends into the map page. */
 export type MapCommand =
   | { type: 'stops'; stops: MapStop[] }
-  | { type: 'user'; position: LatLng | null; nearest: readonly string[]; recenter: boolean };
+  | { type: 'user'; position: LatLng | null; nearest: readonly string[]; recenter: boolean; radiusM: number };
 
 /** Events an embedded page (stop map or image viewer) sends back to the app. */
 export type FrameEvent =

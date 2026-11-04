@@ -1,10 +1,10 @@
-# E2E: Nearby map + dropdown + favourite, then the MRT map tab.
+# E2E: the app opens on Nearby with the closest stop's times already showing,
+# then dropdown + favourite, locate-me, and the MRT map tab.
 # Needs location turned on for the emulator/phone. Run: maestro test .maestro/
 appId: com.colterpan.sgbustiming
 ---
 - launchApp:
     clearState: true
-- tapOn: "Nearby"
 # Android permission dialog (wording differs by Android version)
 - runFlow:
     when:
@@ -13,20 +13,22 @@ appId: com.colterpan.sgbustiming
       - tapOn: "While using the app"
 - assertVisible:
     id: "locate-button"
+# Closest stop is labelled and its bus times show without any tap
 - extendedWaitUntil:
     visible:
-      id: "nearby-toggle-.*"
+      id: "closest-label"
     timeout: 30000
-- tapOn:
-    id: "nearby-toggle-.*"
-    index: 0
 - extendedWaitUntil:
     visible:
       id: "nearby-open-.*"
     timeout: 20000
+# Open a second stop's dropdown and save it
+- tapOn:
+    id: "nearby-toggle-.*"
+    index: 1
 - tapOn:
     id: "nearby-star-.*"
-    index: 0
+    index: 1
 - tapOn:
     id: "locate-button"
 - tapOn: "MRT Map"

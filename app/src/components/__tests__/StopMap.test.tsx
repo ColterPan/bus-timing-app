@@ -52,7 +52,7 @@ describe('StopMap', () => {
 
     expect(injectedCommands()).toEqual([
       { type: 'stops', stops: [['83139', 'Aft Joo Chiat Pl', 1.311, 103.9]] },
-      { type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: ['83139'], recenter: false },
+      { type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: ['83139'], recenter: false, radiusM: 500 },
     ]);
   });
 

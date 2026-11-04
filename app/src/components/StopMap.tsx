@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useColorScheme } from 'react-native';
-import type { LatLng } from '../lib/geo';
+import { NEARBY_RADIUS_M, type LatLng } from '../lib/geo';
 import { buildStopMapHtml } from '../lib/mapHtml';
 import { parseFrameEvent, toMapStops, type MapCommand } from '../lib/mapProtocol';
+import { useTheme } from '../theme';
 import type { BusStop } from '../types';
 import { HtmlFrame } from './HtmlFrame';
 import type { HtmlFrameHandle } from './HtmlFrame.types';
@@ -18,7 +18,7 @@ interface StopMapProps {
 
 /** Interactive map of bus stops with the user's position (Leaflet + OneMap). */
 export function StopMap({ stops, user, nearestCodes, recenterToken, onSelectStop }: StopMapProps) {
-  const dark = useColorScheme() === 'dark';
+  const { dark } = useTheme();
   const html = useMemo(() => buildStopMapHtml({ dark }), [dark]);
   const frame = useRef<HtmlFrameHandle>(null);
   // Bumped on every "ready" so a reloaded page (e.g. theme change) gets its data again
@@ -41,13 +41,15 @@ export function StopMap({ stops, user, nearestCodes, recenterToken, onSelectStop
   }, [readyCount, stops]);
 
   useEffect(() => {
-    if (readyCount > 0) post({ type: 'user', position: user, nearest: nearestCodes, recenter: false });
+    if (readyCount > 0) {
+      post({ type: 'user', position: user, nearest: nearestCodes, recenter: false, radiusM: NEARBY_RADIUS_M });
+    }
   }, [readyCount, user, nearestCodes]);
 
   useEffect(() => {
     if (readyCount === 0 || recenterToken === lastRecenterToken.current) return;
     lastRecenterToken.current = recenterToken;
-    post({ type: 'user', position: user, nearest: nearestCodes, recenter: true });
+    post({ type: 'user', position: user, nearest: nearestCodes, recenter: true, radiusM: NEARBY_RADIUS_M });
   }, [readyCount, recenterToken, user, nearestCodes]);
 
   return <HtmlFrame ref={frame} html={html} onMessage={onMessage} title="Map of nearby bus stops" testID="stop-map" />;

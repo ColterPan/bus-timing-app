@@ -1,7 +1,10 @@
+import { useContext } from 'react';
 import { useColorScheme } from 'react-native';
+import { ThemeContext } from './store/ThemeContext';
 import type { Load } from './types';
 
 const light = {
+  dark: false,
   background: '#F2F3F7',
   card: '#FFFFFF',
   text: '#111827',
@@ -14,6 +17,7 @@ const light = {
 };
 
 const dark: typeof light = {
+  dark: true,
   background: '#0B0F17',
   card: '#161B26',
   text: '#F3F4F6',
@@ -27,8 +31,12 @@ const dark: typeof light = {
 
 export type Theme = typeof light;
 
+/** The current palette: the user's choice in Settings, or the phone's setting by default. */
 export function useTheme(): Theme {
-  return useColorScheme() === 'dark' ? dark : light;
+  const ctx = useContext(ThemeContext);
+  const system = useColorScheme();
+  const scheme = ctx?.scheme ?? (system === 'dark' ? 'dark' : 'light');
+  return scheme === 'dark' ? dark : light;
 }
 
 export function loadColor(theme: Theme, load: Load | null): string {

@@ -11,3 +11,11 @@ web-build/
 *.apk
 *.aab
 .DS_Store
+
+# Signing keys and store credentials: never commit these
+*.keystore
+*.jks
+*.p12
+credentials.json
+google-service-account*.json
+play-store-key*.json

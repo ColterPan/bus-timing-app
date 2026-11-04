@@ -11,19 +11,22 @@ Phone / laptop browser / emulator ──► Proxy (Hono) ──► LTA DataMall
 | Folder | What | Tests |
 |---|---|---|
 | `server/` | Proxy: `/arrivals/:code`, `/stops`, `/health`. Holds the API key, caches responses, rate-limits callers | Vitest, 36 tests, ~95% coverage |
-| `app/` | Expo SDK 58 app: Favourites, Nearby (map + GPS), Search, MRT Map, Stop detail | Jest + RNTL, 110 tests, ~99% line coverage; Maestro E2E flows |
+| `app/` | Expo SDK 58 app: Nearby (home: map + GPS), Favourites, Search, MRT Map, Stop detail, Settings | Jest + RNTL, 129 tests, ~99% line coverage; Maestro E2E flows |
 
 ## Features
 
+- **Opens straight onto nearby stops:** no searching needed. The home screen is a map of where you are, with the 500 m area shaded, and the nearest stops listed closest first. The **closest stop is labelled and its bus times are already showing**.
 - **Live bus times:** next 3 buses per service; crowd level (green = seats, amber = standing, red = limited standing); double-deck/bendy badges; wheelchair icon; a "sched" tag when the time isn't live GPS. Auto refresh every 20 s, plus pull to refresh.
 - **Nearby map:**
   - A draggable map with a blue "you are here" dot and bus-stop pins (the nearest are orange). Tap a pin to open that stop's times.
-  - The ⌖ button jumps back to your location, and the tab re-locates you whenever you open it.
-- **Nearby list:** the 10 nearest stops under the map. Tap one to drop down its live times, or ☆ to save it.
+  - The ⌖ button jumps back to your location, and the screen re-locates you whenever you return to it.
+- **Nearby list:** tap any stop to drop down its live times (several can be open at once), or ☆ to save it.
 - **Favourites:** save stops with the ☆ from Nearby, Search or the stop page, and pin specific services.
 - **Search:** by 5-digit stop code, stop name or road.
 - **MRT map:** LTA's official system map (pinch or tap to zoom), with a link to the latest version on LTA's site.
-- Dark mode follows the phone setting.
+- **Themes:** ⚙ Settings → Appearance: System default, Light or Dark (remembered; the maps switch too).
+
+**Publishing:** [docs/PUBLISHING.md](docs/PUBLISHING.md) is a step-by-step Google Play guide. The privacy policy is at [docs/PRIVACY.md](docs/PRIVACY.md).
 
 **Credits:** map tiles by [OneMap](https://www.onemap.gov.sg/) © Singapore Land Authority, with [Leaflet](https://leafletjs.com/); MRT system map © [Land Transport Authority](https://www.lta.gov.sg/), loaded live from LTA's website; bus data from [LTA DataMall](https://datamall.lta.gov.sg/). None of these need an API key in the app. The only key (LTA DataMall) stays on the proxy server.
 
@@ -148,7 +151,8 @@ Then build the APK:
 - [ ] **Arrivals:** at a real stop, the times match the stop's LED panel or another app within about 1 minute
 - [ ] **Auto refresh:** leave the stop screen open; "Updated" time changes every ~20 s
 - [ ] **Crowd colours** and DD/BD badges look right for buses you can see
-- [ ] **Nearby:** grant location; the closest stops are listed with sensible distances
+- [ ] **Home:** open the app; it lands on Nearby; after allowing location, the closest stop (labelled CLOSEST) already shows its bus times with no tap
+- [ ] **Nearby:** grant location; the closest stops are listed with sensible distances; the shaded circle on the map is about 500 m around you
 - [ ] **Map:** the blue dot is where you're standing; drag and pinch to explore; zoom in to see more pins; tap a pin to open that stop's times
 - [ ] **⌖ button:** drag the map away, tap ⌖, and it jumps back to you
 - [ ] **Dropdown:** tap a nearby stop to see its live times inline; tap again to close; ☆ saves it
@@ -159,7 +163,7 @@ Then build the APK:
 - [ ] **Favourites:** star a stop and it shows on Home; pin one service and only that service shows; kill and reopen the app and favourites are still there
 - [ ] **Offline:** airplane mode; you see a friendly error with "Try again", not a crash. Nearby/Search still work from the stop list cached on the phone
 - [ ] **Late night:** a stop with no buses shows "No buses are serving this stop right now"
-- [ ] **Dark mode:** switch the phone to dark mode and the app follows
+- [ ] **Themes:** ⚙ → Appearance → Dark makes everything dark (including the map); Light stays light even if the phone is in dark mode; System default follows the phone; your choice is remembered after closing the app
 
 ---
 

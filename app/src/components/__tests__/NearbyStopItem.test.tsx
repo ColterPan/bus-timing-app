@@ -93,6 +93,21 @@ describe('NearbyStopItem', () => {
     expect(screen.getByText('No buses right now.')).toBeOnTheScreen();
   });
 
+  it('labels the closest stop', async () => {
+    const { view } = setup({ isClosest: true });
+    await view;
+
+    expect(screen.getByText('CLOSEST')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Closest stop, Aft Joo Chiat Pl/ })).toBeOnTheScreen();
+  });
+
+  it('has no closest label on other stops', async () => {
+    const { view } = setup();
+    await view;
+
+    expect(screen.queryByText('CLOSEST')).toBeNull();
+  });
+
   it('saves the stop with the star', async () => {
     const { view, props } = setup({ isFavourite: true });
     await view;

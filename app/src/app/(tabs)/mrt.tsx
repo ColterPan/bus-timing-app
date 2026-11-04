@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { HtmlFrame } from '../../components/HtmlFrame';
 import { StateView } from '../../components/StateView';
 import { LTA_RAIL_NETWORK_URL, MRT_MAP_IMAGE_URL } from '../../lib/links';
@@ -12,7 +12,7 @@ type Status = 'loading' | 'loaded' | 'error';
 
 export default function MrtScreen() {
   const theme = useTheme();
-  const dark = useColorScheme() === 'dark';
+  const { dark } = theme;
   const html = useMemo(() => buildImageViewerHtml(MRT_MAP_IMAGE_URL, { dark }), [dark]);
   const [status, setStatus] = useState<Status>('loading');
 

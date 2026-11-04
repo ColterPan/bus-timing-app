@@ -10,6 +10,8 @@ interface NearbyStopItemProps {
   stop: BusStop;
   distanceM: number;
   expanded: boolean;
+  /** The single closest stop gets a "CLOSEST" label. */
+  isClosest?: boolean;
   /** Whether the screen is visible; arrivals only poll while expanded and active. */
   active: boolean;
   isFavourite: boolean;
@@ -23,6 +25,7 @@ export function NearbyStopItem({
   stop,
   distanceM,
   expanded,
+  isClosest = false,
   active,
   isFavourite,
   onToggleExpand,
@@ -41,11 +44,16 @@ export function NearbyStopItem({
           style={styles.headerMain}
           onPress={onToggleExpand}
           accessibilityRole="button"
-          accessibilityState={{ expanded }}
-          accessibilityLabel={`${stop.name}, ${distance} away, ${expanded ? 'hide' : 'show'} bus times`}
+          aria-expanded={expanded}
+          accessibilityLabel={`${isClosest ? 'Closest stop, ' : ''}${stop.name}, ${distance} away, ${expanded ? 'hide' : 'show'} bus times`}
           testID={`nearby-toggle-${stop.code}`}
         >
           <View style={styles.text}>
+            {isClosest ? (
+              <Text style={[styles.closest, { color: theme.primary }]} testID="closest-label">
+                CLOSEST
+              </Text>
+            ) : null}
             <Text style={[styles.name, { color: theme.text }]}>{stop.name}</Text>
             <Text style={[styles.sub, { color: theme.muted }]}>
               {stop.code} · {stop.road}
@@ -94,6 +102,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', paddingRight: 14 },
   headerMain: { flex: 1, flexDirection: 'row', alignItems: 'center', padding: 14, gap: 8 },
   text: { flex: 1 },
+  closest: { fontSize: 11, fontWeight: '800', letterSpacing: 0.6, marginBottom: 2 },
   name: { fontSize: 16, fontWeight: '600' },
   sub: { fontSize: 13, marginTop: 2 },
   distance: { fontSize: 13, fontWeight: '600' },

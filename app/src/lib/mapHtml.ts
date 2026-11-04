@@ -17,6 +17,12 @@ const ONEMAP_ATTRIBUTION =
 
 const BG = { light: '#F2F3F7', dark: '#0B0F17' };
 
+// Leaflet's zoom buttons and credits bar are white by default; match them to dark mode
+const DARK_CONTROLS_CSS = `
+  .leaflet-bar a, .leaflet-bar a:hover { background: #161B26; color: #F3F4F6; border-bottom-color: #262C3A; }
+  .leaflet-control-attribution { background: rgba(22, 27, 38, 0.85) !important; color: #9CA3AF; }
+  .leaflet-control-attribution a { color: #5EA0FF; }`;
+
 /** Sends a message to the app from inside the page (WebView bridge or parent window). */
 const SEND_FN = `function send(msg) {
     var s = JSON.stringify(msg);
@@ -48,6 +54,7 @@ function mapScript(tilesUrl: string): string {
   var stops = [];
   var nearest = {};
   var userMarker = null;
+  var radiusCircle = null;
   var centred = false;
 
   function label(stop) {
@@ -89,12 +96,30 @@ function mapScript(tilesUrl: string): string {
     }
   }
 
-  function setUser(position) {
+  function setUser(position, radiusM) {
     if (!position) {
       if (userMarker) { userMarker.remove(); userMarker = null; }
+      if (radiusCircle) { radiusCircle.remove(); radiusCircle = null; }
       return;
     }
     var latLng = [position.lat, position.lng];
+    // Shaded circle showing how far "nearby" reaches
+    if (radiusM > 0) {
+      if (radiusCircle) {
+        radiusCircle.setLatLng(latLng);
+        radiusCircle.setRadius(radiusM);
+      } else {
+        radiusCircle = L.circle(latLng, {
+          radius: radiusM,
+          color: '#1E6FD9',
+          weight: 1,
+          opacity: 0.5,
+          fillColor: '#1E6FD9',
+          fillOpacity: 0.07,
+          interactive: false
+        }).addTo(map);
+      }
+    }
     if (userMarker) {
       userMarker.setLatLng(latLng);
     } else {
@@ -115,7 +140,7 @@ function mapScript(tilesUrl: string): string {
     } else if (cmd.type === 'user') {
       nearest = {};
       (cmd.nearest || []).forEach(function (code) { nearest[code] = true; });
-      setUser(cmd.position);
+      setUser(cmd.position, cmd.radiusM);
       // Centre on the first fix or when asked; otherwise leave the map where the user dragged it
       if (cmd.position && (cmd.recenter || !centred)) {
         centred = true;
@@ -156,7 +181,7 @@ export function buildStopMapHtml({ dark }: { dark: boolean }): string {
     70% { box-shadow: 0 0 0 16px rgba(30, 111, 217, 0); }
     100% { box-shadow: 0 0 0 0 rgba(30, 111, 217, 0); }
   }
-  .leaflet-tooltip { font: 13px system-ui, sans-serif; }
+  .leaflet-tooltip { font: 13px system-ui, sans-serif; }${dark ? DARK_CONTROLS_CSS : ''}
 </style>
 </head>
 <body>

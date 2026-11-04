@@ -2,7 +2,8 @@ import type { BusStop } from '../types';
 
 const EARTH_RADIUS_M = 6_371_000;
 const DEFAULT_LIMIT = 10;
-const DEFAULT_MAX_METERS = 500;
+/** How far "nearby" reaches; also drawn as the circle on the map. */
+export const NEARBY_RADIUS_M = 500;
 const METERS_PER_KM = 1_000;
 
 export interface LatLng {
@@ -27,7 +28,7 @@ export function haversineMeters(a: LatLng, b: LatLng): number {
 export function nearestStops(
   stops: readonly BusStop[],
   origin: LatLng,
-  { limit = DEFAULT_LIMIT, maxMeters = DEFAULT_MAX_METERS } = {},
+  { limit = DEFAULT_LIMIT, maxMeters = NEARBY_RADIUS_M } = {},
 ): NearbyStop[] {
   return stops
     .map((stop) => ({ stop, distanceM: haversineMeters(origin, stop) }))

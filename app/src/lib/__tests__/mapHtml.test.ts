@@ -45,7 +45,23 @@ function fakeLeaflet() {
   const userMarker = { latlng: null as unknown, setLatLng: jest.fn(), addTo: jest.fn(), remove: jest.fn() };
   userMarker.setLatLng.mockImplementation((l) => ((userMarker.latlng = l), userMarker));
   userMarker.addTo.mockReturnValue(userMarker);
+  const circle = {
+    latlng: null as unknown,
+    radius: 0,
+    setLatLng: jest.fn(),
+    setRadius: jest.fn(),
+    addTo: jest.fn(),
+    remove: jest.fn(),
+  };
+  circle.setLatLng.mockImplementation((l) => ((circle.latlng = l), circle));
+  circle.setRadius.mockImplementation((r) => ((circle.radius = r), circle));
+  circle.addTo.mockReturnValue(circle);
   const L = {
+    circle: jest.fn((latlng: unknown, opts: { radius: number }) => {
+      circle.latlng = latlng;
+      circle.radius = opts.radius;
+      return circle;
+    }),
     map: jest.fn(() => map),
     tileLayer: jest.fn(() => ({ addTo: () => undefined })),
     layerGroup: () => layer,
@@ -59,7 +75,7 @@ function fakeLeaflet() {
       return m;
     },
   };
-  return { L, map, handlers, layerItems, userMarker };
+  return { L, map, handlers, layerItems, userMarker, circle };
 }
 
 function runMapPage(dark = false) {
@@ -90,8 +106,11 @@ describe('buildStopMapHtml', () => {
     expect(html).toContain('Singapore Land Authority');
   });
 
-  it('uses the Night tiles in dark mode', () => {
-    expect(buildStopMapHtml({ dark: true })).toContain('/maps/tiles/Night/');
+  it('uses the Night tiles and dark map controls in dark mode', () => {
+    const html = buildStopMapHtml({ dark: true });
+    expect(html).toContain('/maps/tiles/Night/');
+    expect(html).toContain('.leaflet-control-attribution { background: rgba(22, 27, 38');
+    expect(buildStopMapHtml({ dark: false })).not.toContain('.leaflet-control-attribution {');
   });
 
   it('never builds HTML from stop names', () => {
@@ -146,6 +165,28 @@ describe('map page script', () => {
 
     win.onAppCommand({ type: 'user', position: { lat: 1.3113, lng: 103.9 }, nearest: ['83139'], recenter: true });
     expect(map.setView).toHaveBeenCalledWith([1.3113, 103.9], 17);
+  });
+
+  it('draws the search-radius circle around the user and moves it with them', () => {
+    const { win, L, circle } = runMapPage();
+    win.onAppCommand({ type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: [], recenter: false, radiusM: 500 });
+
+    expect(L.circle).toHaveBeenCalledTimes(1);
+    expect(circle.latlng).toEqual([1.31, 103.9]);
+    expect(circle.radius).toBe(500);
+
+    win.onAppCommand({ type: 'user', position: { lat: 1.32, lng: 103.91 }, nearest: [], recenter: false, radiusM: 500 });
+    expect(L.circle).toHaveBeenCalledTimes(1); // reused, not redrawn
+    expect(circle.latlng).toEqual([1.32, 103.91]);
+  });
+
+  it('removes the dot and circle when location is unavailable', () => {
+    const { win, userMarker, circle } = runMapPage();
+    win.onAppCommand({ type: 'user', position: { lat: 1.31, lng: 103.9 }, nearest: [], recenter: false, radiusM: 500 });
+    win.onAppCommand({ type: 'user', position: null, nearest: [], recenter: false, radiusM: 500 });
+
+    expect(userMarker.remove).toHaveBeenCalled();
+    expect(circle.remove).toHaveBeenCalled();
   });
 
   it('ignores unknown commands', () => {
